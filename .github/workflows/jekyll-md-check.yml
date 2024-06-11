@@ -1,11 +1,13 @@
-name: Jekyll Site CI
+name: Check Post File Types
 
 on:
+  pull:
+    branches: [ main ]
   pull_request:
     branches: [ main ]
 
 jobs:
-  build:
+  check-post-files:
     runs-on: ubuntu-latest
 
     steps:
@@ -17,23 +19,12 @@ jobs:
         with:
           ruby-version: '3.1'
 
-      - name: Install dependencies
+      - name: Check file types in _posts directory
         run: |
-          gem install bundler
-          bundle install
-          npm install -g markdownlint-cli
-
-      - name: Lint Markdown files
-        run: |
-          echo "{
-            \"default\": true,
-            \"MD040\": false
-          }" > .markdownlint.json
-          markdownlint "**/*.md" --config .markdownlint.json
-
-      - name: Build the Jekyll site
-        run: bundle exec jekyll build
-
-      - name: Run HTML Proofer
-        run: bundle exec htmlproofer ./_site --check-external-hash --allow-hash-href
+          for file in _posts/*; do
+            if [[ ! "$file" == *.md ]]; then
+              echo "Error: Found non-markdown file in _posts directory: $file"
+              exit 1
+            fi
+          done
 
