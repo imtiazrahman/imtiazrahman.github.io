@@ -1,4 +1,4 @@
-name: Check Post File Types
+name: Check  File Types in _post
 
 on:
   pull_request:
